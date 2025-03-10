@@ -73,26 +73,23 @@ def file_upload_qdrant_sqs(sqs_message):
         # print("response:", response)
         
         if response:
-    	   return "Ingesting Done"
+            return "Ingesting Done"
         else:
-    	#os.remove(file_path)
-    	return "Ingestion Failed"
+            return "Ingestion Failed"
 
     except Exception as e:
     # If the file was saved, attempt to remove it
-        if 'file_path' in locals():
-            try:
-                os.remove(file_path)
-            except:
-                pass  # If file removal fails, we don't want to mask the original error
-        
-        # Log the error (you might want to use a proper logging system)
-        print(f"An error occurred: {str(e)}")
-        
-        # Return a user-friendly error message
-        return f"An error occurred during file processing: {str(e)}"
+    if 'file_path' in locals():
+        try:
+            os.remove(file_path)
+        except:
+            pass  # If file removal fails, we don't want to mask the original error
 
-missed_files_from_folder_to_azure =  []
+    # Log the error (you might want to use a proper logging system)
+    print(f"An error occurred: {str(e)}")
+    # Return a user-friendly error message
+    return f"An error occurred during file processing: {str(e)}"
+
 def folder_upload_qdrant_sqs(sqs_message):
     zip_file_path = sqs_message['zip_file_path']
     destination_folder = sqs_message['destination_folder']
@@ -183,17 +180,6 @@ def ingest_file_process(folder_path, file_path, collection_name, model_type):
                                         config["qdrant_api_key"], config['embedding_model'], config['cache_folder'],
                                         config['open_api_key'])
     print("ingest_file_process:", response)
-
-    if response:
-        share_name = config["share_name"]
-        response_azure_upload, response_azure_binary = upload_files_from_folder_to_directory(share_name, file_path,
-                                                                                             file_path)
-        response_azure_upload_master, response_azure_binary_master = upload_files_from_folder_to_directory(
-            config["master_share_name"], file_path, file_path)
-        print("ingest_file_process: ", response_azure_binary, response_azure_upload)
-        if response_azure_binary == False:
-            missed_files_from_folder_to_azure.append(file_path)
-        os.remove(file_path)
 
     return
 
