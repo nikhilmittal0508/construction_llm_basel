@@ -29,6 +29,7 @@ from langchain_community.document_loaders import UnstructuredFileLoader, TextLoa
     UnstructuredExcelLoader, WebBaseLoader, PyPDFLoader, Docx2txtLoader
 from concurrent.futures import ProcessPoolExecutor
 from sqs_queue_url import *
+from utils import *
 
 import warnings
 warnings.filterwarnings('ignore')
