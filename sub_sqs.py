@@ -54,6 +54,16 @@ def file_upload_qdrant_sqs(sqs_message):
     model_type = sqs_message['model_type']
     folder_path = sqs_message['folder_path']
 
+    with open(file_path, 'rb') as f:
+        raw_data = f.read(10000)  # Read a small chunk of data
+        result = chardet.detect(raw_data)
+        encoding = result['encoding']
+
+    # Now read the file with the correct encoding
+    with open(file_path, 'r', encoding=encoding, errors='ignore') as f:
+        text = f.read()
+
+
     # try:
 
     if filename.lower().endswith((".json")):
