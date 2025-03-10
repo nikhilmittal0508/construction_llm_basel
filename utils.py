@@ -256,3 +256,74 @@ def ingesting_file_qdrant_db(collection_name, texts, model_type, url, qdrant_api
                     )
     return True
 
+
+def texts_splitter(documents):
+    try:
+        # Split documents into chunks
+        # text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+        # text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=8000, chunk_overlap=0)
+        texts = text_splitter.split_documents(documents)
+        return texts
+    except Exception as e:
+        error_message = f"An error occurred during text splitting: {str(e)}"
+        raise RuntimeError(error_message)
+
+
+def check_file_present_qdrant_collection(collection_name, qdrant_client, file_path):
+    try:
+        # qdrant_client = QdrantClient(url=url, api_key=api_key)
+        a = qdrant_client.scroll(
+            collection_name=collection_name,
+            scroll_filter=models.Filter(must=[
+            models.FieldCondition(
+                key="metadata.source",
+                    match=models.MatchValue(value=file_path),
+            ),
+        ])
+        )
+        
+        if len(a[0]) > 0:
+            return True
+        else:
+            return False
+    
+    except Exception as e:
+        error_message = f"An error occurred: {str(e)}"
+        raise RuntimeError(error_message)
+        
+        
+def check_qdrant_ingested_files(collection_name, qdrant_client): #to  check the files already ingested or not in the  given qdrant collection
+    try:
+        # qdrant_client = QdrantClient(url=url, api_key=api_key)
+        a = qdrant_client.scroll(
+            collection_name=collection_name,
+            scroll_filter=models.Filter(),
+            limit=100000000000
+        )
+        unique_filenames = {os.path.basename(entry.payload["metadata"]['source']) for entry in a[0]}
+        already_ingested_files = sorted(list(unique_filenames))
+        return already_ingested_files
+    
+    except Exception as e:
+        error_message = f"An error occurred: {str(e)}"
+        raise RuntimeError(error_message)
+        
+        
+        
+def ingesting_file_qdrant_db(collection_name, texts, model_type, url, qdrant_api_key,  embedding_model, cache_folder, openai_api_key):
+    if model_type == "openai":
+        embedding_function = OpenAIEmbeddings(openai_api_key=openai_api_key)
+    elif model_type == "mistral":
+        embedding_function = HuggingFaceEmbeddings(model_name=embedding_model, cache_folder=cache_folder)
+    
+    # Create a vectorstore from documents
+    qdrant = Qdrant.from_documents(
+                        texts,
+                        embedding_function,
+                        url=url,
+                        prefer_grpc=True,
+                        api_key=qdrant_api_key,
+                        collection_name=collection_name,
+                    )
+    return True
