@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
 from flask_restful import Api
-from utils import *
 from zipfile import ZipFile
 # import transformers
 # from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
@@ -30,16 +29,13 @@ from langchain_community.document_loaders.csv_loader import CSVLoader
 # from transformers import AutoModelForSequenceClassification
 from langchain.document_loaders import UnstructuredFileLoader, TextLoader, JSONLoader, PyPDFLoader
 import json
-
 import openai
 #from langchain.llms import OpenAI
 from langchain_openai import ChatOpenAI, OpenAI
 import shutil
 from concurrent.futures import ProcessPoolExecutor
 from sqs_queue_url import *
-
-
-
+from utils import *
 
 import warnings
 warnings.filterwarnings('ignore')
