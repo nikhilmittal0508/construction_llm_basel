@@ -174,6 +174,7 @@ def folder_upload_qdrant_sqs(sqs_message):
 def ingest_file_process(folder_path, file_path, collection_name, model_type):
     print("ingest_file_process: file_path", file_path)
     # file_path = os.path.join(folder_path, filename)
+    filename = file_path
 
     if filename.lower().endswith((".json")):
         loader = JSONLoader(file_path, jq_schema='.content')
