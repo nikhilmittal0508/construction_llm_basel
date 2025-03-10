@@ -28,6 +28,7 @@ import shutil
 from langchain_community.document_loaders import UnstructuredFileLoader, TextLoader, JSONLoader, BSHTMLLoader, \
     UnstructuredExcelLoader, WebBaseLoader, PyPDFLoader, Docx2txtLoader
 from concurrent.futures import ProcessPoolExecutor
+from zipfile import ZipFile
 from sqs_queue_url import *
 from utils import *
 
@@ -111,63 +112,63 @@ def folder_upload_qdrant_sqs(sqs_message):
     collection_name = sqs_message['collection_name']
     model_type = sqs_message['model_type']
 
-    try:
-	    with ZipFile(zip_file_path, 'r') as zObject:
-	    	zObject.extractall(path=destination_folder)
+    # try:
+    with ZipFile(zip_file_path, 'r') as zObject:
+    	zObject.extractall(path=destination_folder)
 
-	    if os.path.exists(zip_file_path):
-	    	os.remove(zip_file_path)
-	    else:
-	    	print("The file does not exist")
+    if os.path.exists(zip_file_path):
+    	os.remove(zip_file_path)
+    else:
+    	print("The file does not exist")
 
-	    file_list = []
-	    for root, dirs, files in os.walk(destination_folder):
-	    	for file_name in files:
-	    		file_path = os.path.join(root, file_name)
-	    		if file_path.endswith((".txt", ".pdf", ".docx", ".xlsx", ".pptx", ".csv", ".html", ".json", ".wav", ".mp3", ".eml")):
-	    			file_list.append(file_path)
+    file_list = []
+    for root, dirs, files in os.walk(destination_folder):
+    	for file_name in files:
+    		file_path = os.path.join(root, file_name)
+    		if file_path.endswith((".txt", ".pdf", ".docx", ".xlsx", ".pptx", ".csv", ".html", ".json", ".wav", ".mp3", ".eml")):
+    			file_list.append(file_path)
 
-	    print("to_be_ingested:", file_list)
+    print("to_be_ingested:", file_list)
 
-	    if len(file_list) > 0:
-	    	errors = []
-	    	try:
-	    		with ProcessPoolExecutor(max_workers=1) as executor:
-	    			futures = []
-	    			for i, file_path in tqdm.tqdm(enumerate(file_list)):
-	    				try:
-	    					print("\n new file getting ingested....")
-	    					future = executor.submit(ingest_file_process, destination_folder, os.path.normpath(file_path),collection_name, model_type)
-	    					futures.append(future)
-	    				except Exception as e:
-	    					error_message = f"Error submitting task for file {file_path}: {str(e)}"
-	    					print(error_message)  # Print the error
-	    					errors.append(error_message)  # Add the error to the list
+    if len(file_list) > 0:
+    	errors = []
+    	try:
+    		with ProcessPoolExecutor(max_workers=1) as executor:
+    			futures = []
+    			for i, file_path in tqdm.tqdm(enumerate(file_list)):
+    				try:
+    					print("\n new file getting ingested....")
+    					future = executor.submit(ingest_file_process, destination_folder, os.path.normpath(file_path),collection_name, model_type)
+    					futures.append(future)
+    				except Exception as e:
+    					error_message = f"Error submitting task for file {file_path}: {str(e)}"
+    					print(error_message)  # Print the error
+    					errors.append(error_message)  # Add the error to the list
 
-	    			# Wait for all tasks to complete
-	    			results = []
-	    			for future in futures:
-	    				try:
-	    					result = future.result()
-	    					results.append(result)
-	    				except Exception as e:
-	    					print(f"Error in task execution: {str(e)}")
+    			# Wait for all tasks to complete
+    			results = []
+    			for future in futures:
+    				try:
+    					result = future.result()
+    					results.append(result)
+    				except Exception as e:
+    					print(f"Error in task execution: {str(e)}")
 
-	    	except Exception as e:
-	    		print(f"An error occurred in the process pool execution: {str(e)}")
-	    	finally:
-	    		# Ensure the executor is shut down properly
-	    		executor.shutdown(wait=True)
+    	except Exception as e:
+    		print(f"An error occurred in the process pool execution: {str(e)}")
+    	finally:
+    		# Ensure the executor is shut down properly
+    		executor.shutdown(wait=True)
 
-	    # After all operations, save the errors to a file
-	    with open('error_log.json', 'w') as f:
-	    	json.dump(errors, f, indent=4)
+    # After all operations, save the errors to a file
+    with open('error_log.json', 'w') as f:
+    	json.dump(errors, f, indent=4)
 
-	    # Open the file in write mode
-	    return "Ingestion Complete"
+    # Open the file in write mode
+    return "Ingestion Complete"
 
-    except Exception as e:
-    	return f"Ingestion Incomplete with error: {str(e)}"
+    # except Exception as e:
+    # 	return f"Ingestion Incomplete with error: {str(e)}"
 
 
 def ingest_file_process(folder_path, file_path, collection_name, model_type):
