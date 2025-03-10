@@ -83,7 +83,7 @@ def file_upload_qdrant_sqs(sqs_message):
     texts = texts_splitter(documents)
     
     # Ingestion
-    response = ingesting_file_qdrant_db(collection_name, texts, model_type, config["qdrant_url"], config["qdrant_api_key"],
+    response = ingesting_file_qdrant_db(collection_name, texts, model_type, config["url"], config["qdrant_api_key"],
 					config['embedding_model'], config['cache_folder'], config['open_api_key'])
     # print("response:", response)
     
@@ -203,7 +203,7 @@ def ingest_file_process(folder_path, file_path, collection_name, model_type):
     print("ingest_file_process, texts lenght: ", len(texts))
 
     # Ingestion
-    response = ingesting_file_qdrant_db(collection_name, texts, model_type, config["qdrant_url"],
+    response = ingesting_file_qdrant_db(collection_name, texts, model_type, config["url"],
                                         config["qdrant_api_key"], config['embedding_model'], config['cache_folder'],
                                         config['open_api_key'])
     print("ingest_file_process:", response)
