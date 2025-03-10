@@ -26,7 +26,8 @@ from qdrant_client import QdrantClient
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.callbacks.manager import CallbackManager
 from langchain_community.document_loaders.csv_loader import CSVLoader
-from sentence_transformers import CrossEncoder
+# from sentence_transformers import CrossEncoder
+from transformers import AutoModelForSequenceClassification
 from langchain.document_loaders import UnstructuredFileLoader, TextLoader, JSONLoader, PyPDFLoader
 import json
 
@@ -50,7 +51,18 @@ with open(config_file_path, 'r') as config_file:
     config = config_data.get('config', {})
     
     
-hal_model = CrossEncoder('vectara/hallucination_evaluation_model')
+# Set the cache directory
+cache_dir = "./hal_model"
+
+# Create the cache directory if it doesn't exist
+os.makedirs(cache_dir, exist_ok=True)
+
+hal_model = AutoModelForSequenceClassification.from_pretrained('vectara/hallucination_evaluation_model',
+                                                               trust_remote_code=True,
+                                                               cache_dir=cache_dir,
+                                                               # token="",
+                                                               revision="main")
+
 
 # Initiate the memory
 memory = ConversationBufferMemory(
