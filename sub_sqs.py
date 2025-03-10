@@ -88,7 +88,7 @@ def file_upload_qdrant_sqs(sqs_message):
 	    # print("response:", response)
 	    
 	    if response:
-            return "Ingesting Done"
+            	return "Ingesting Done"
 	    else:
 	        #os.remove(file_path)
 	        return "Ingestion Failed"
