@@ -79,16 +79,16 @@ def file_upload_qdrant_sqs(sqs_message):
 
     except Exception as e:
     # If the file was saved, attempt to remove it
-    if 'file_path' in locals():
-        try:
-            os.remove(file_path)
-        except:
-            pass  # If file removal fails, we don't want to mask the original error
+        if 'file_path' in locals():
+            try:
+                os.remove(file_path)
+            except:
+                pass  # If file removal fails, we don't want to mask the original error
 
-    # Log the error (you might want to use a proper logging system)
-    print(f"An error occurred: {str(e)}")
-    # Return a user-friendly error message
-    return f"An error occurred during file processing: {str(e)}"
+        # Log the error (you might want to use a proper logging system)
+        print(f"An error occurred: {str(e)}")
+        # Return a user-friendly error message
+        return f"An error occurred during file processing: {str(e)}"
 
 def folder_upload_qdrant_sqs(sqs_message):
     zip_file_path = sqs_message['zip_file_path']
