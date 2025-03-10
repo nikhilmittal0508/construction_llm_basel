@@ -23,6 +23,7 @@ from sentence_transformers import CrossEncoder
 from langchain.document_loaders import UnstructuredFileLoader, TextLoader, JSONLoader, PyPDFLoader
 import json
 import openai
+import chardet
 from langchain_openai import ChatOpenAI, OpenAI
 import shutil
 from langchain_community.document_loaders import UnstructuredFileLoader, TextLoader, JSONLoader, BSHTMLLoader, \
