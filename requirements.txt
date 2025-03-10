@@ -15,3 +15,5 @@ unstructured[docs]
 unstructured[pdf]
 unstructured[all-docs]
 boto3
+sentence-transformers==2.3.1
+
