@@ -38,7 +38,7 @@ with open(config_file_path, 'r') as config_file:
     config = config_data.get('config', {})
 
 qdrant_client = QdrantClient(
-    url=config['qdrant_url'],
+    url=config['url'],
     api_key=config['qdrant_api_key'],
 )
 
