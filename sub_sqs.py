@@ -25,6 +25,8 @@ import json
 import openai
 from langchain_openai import ChatOpenAI, OpenAI
 import shutil
+from langchain_community.document_loaders import UnstructuredFileLoader, TextLoader, JSONLoader, BSHTMLLoader, \
+    UnstructuredExcelLoader, WebBaseLoader, PyPDFLoader, Docx2txtLoader
 from concurrent.futures import ProcessPoolExecutor
 from sqs_queue_url import *
 
@@ -58,6 +60,18 @@ def file_upload_qdrant_sqs(sqs_message):
 
     elif filename.lower().endswith((".csv")):
         loader = CSVLoader(file_path)
+        documents = loader.load()
+
+    elif file_path.endswith(".pdf"):
+        loader = PyPDFLoader(file_path)
+        documents = loader.load()
+
+    elif file_path.endswith('.txt'):
+        loader = TextLoader(file_path)
+        documents = loader.load()
+
+    elif file_path.endswith('.docx'):
+        loader = Docx2txtLoader(file_path)
         documents = loader.load()
 
     else:
@@ -159,12 +173,24 @@ def ingest_file_process(folder_path, file_path, collection_name, model_type):
     print("ingest_file_process: file_path", file_path)
     # file_path = os.path.join(folder_path, filename)
 
-    if file_path.endswith((".json")):
+    if filename.lower().endswith((".json")):
         loader = JSONLoader(file_path, jq_schema='.content')
         documents = loader.load()
 
-    elif file_path.endswith((".csv")):
+    elif filename.lower().endswith((".csv")):
         loader = CSVLoader(file_path)
+        documents = loader.load()
+
+    elif file_path.endswith(".pdf"):
+        loader = PyPDFLoader(file_path)
+        documents = loader.load()
+
+    elif file_path.endswith('.txt'):
+        loader = TextLoader(file_path)
+        documents = loader.load()
+
+    elif file_path.endswith('.docx'):
+        loader = Docx2txtLoader(file_path)
         documents = loader.load()
 
     else:
