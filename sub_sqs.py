@@ -122,7 +122,8 @@ def folder_upload_qdrant_sqs(sqs_message):
     	print("The file does not exist")
 
     file_list = []
-    for root, dirs, files in os.walk(destination_folder):
+    full_folder_path = zip_file_path.split('.')[0]
+    for root, dirs, files in os.walk(full_folder_path):
     	for file_name in files:
     		file_path = os.path.join(root, file_name)
     		if file_path.endswith((".txt", ".pdf", ".docx", ".xlsx", ".pptx", ".csv", ".html", ".json", ".wav", ".mp3", ".eml")):
@@ -174,13 +175,12 @@ def folder_upload_qdrant_sqs(sqs_message):
 def ingest_file_process(folder_path, file_path, collection_name, model_type):
     print("ingest_file_process: file_path", file_path)
     # file_path = os.path.join(folder_path, filename)
-    filename = file_path
 
-    if filename.lower().endswith((".json")):
+    if file_path.lower().endswith((".json")):
         loader = JSONLoader(file_path, jq_schema='.content')
         documents = loader.load()
 
-    elif filename.lower().endswith((".csv")):
+    elif file_path.lower().endswith((".csv")):
         loader = CSVLoader(file_path)
         documents = loader.load()
 
