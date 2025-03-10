@@ -51,34 +51,19 @@ def file_upload_qdrant_sqs(sqs_message):
     folder_path = sqs_message['folder_path']
 
     try:
+
         if filename.lower().endswith((".json")):
-    	loader = JSONLoader(file_path, jq_schema='.content')
-    	documents = loader.load()
+            loader = JSONLoader(file_path, jq_schema='.content')
+            documents = loader.load()
 
         elif filename.lower().endswith((".csv")):
-    	loader = CSVLoader(file_path)
-    	documents = loader.load()
-    	
-        elif filename.lower().endswith((".pdf")):
-    	loader = PyPDFLoader(file_path)
-    	documents = loader.load()
+            loader = CSVLoader(file_path)
+            documents = loader.load()
 
-        elif filename.lower().endswith((".xlsx")):
-    	loader = UnstructuredExcelLoader(file_path)
-    	documents = loader.load()
-    	
-        elif filename.lower().endswith((".wav", ".mp3")):
-    	documents = audio_to_text(file_path)
-        
         else:
-    	loader = UnstructuredFileLoader(file_path)
-    	documents = loader.load()
-    	
-        image_documents = extract_images(file_path)
-        
-        if len(image_documents) > 0:
-    	documents.append(image_documents[0])
-        
+            loader = UnstructuredFileLoader(file_path)
+            documents = loader.load()
+
         # Split documents into chunks
         texts = texts_splitter(documents)
         
@@ -185,24 +170,9 @@ def ingest_file_process(folder_path, file_path, collection_name, model_type):
         loader = CSVLoader(file_path)
         documents = loader.load()
 
-    elif file_path.endswith((".pdf")):
-        loader = PyPDFLoader(file_path)
-        documents = loader.load()
-
-    elif file_path.endswith((".xlsx")):
-        loader = UnstructuredExcelLoader(file_path)
-        documents = loader.load()
-
-    elif file_path.endswith((".wav", ".mp3")):
-        documents = audio_to_text(file_path)
-
     else:
         loader = UnstructuredFileLoader(file_path)
         documents = loader.load()
-
-    image_documents = extract_images(file_path)
-    if len(image_documents) > 0:
-        documents.append(image_documents[0])
 
     # Split documents into chunks
     texts = texts_splitter(documents)
