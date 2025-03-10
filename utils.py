@@ -206,21 +206,7 @@ def delete_folder_from_source_collection_folder(folder_name_to_del, collection, 
         print(f"Folder '{folder_path}' does not exist.")
         return False
 
-    
-    
-def texts_splitter(documents):
-    try:
-        # Split documents into chunks
-        # text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-        # text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=3000, chunk_overlap=0)
-        texts = text_splitter.split_documents(documents)
-        return texts
-    except Exception as e:
-        error_message = f"An error occurred during text splitting: {str(e)}"
-        raise RuntimeError(error_message)
-        
-        
+                
 def check_qdrant_ingested_files(collection_name, qdrant_client): #to  check the files already ingested or not in the  given qdrant collection
     try:
         # qdrant_client = QdrantClient(url=url, api_key=api_key)

@@ -50,62 +50,62 @@ def file_upload_qdrant_sqs(sqs_message):
     model_type = sqs_message['model_type']
     folder_path = sqs_message['folder_path']
 
-    # try:
-    if filename.lower().endswith((".json")):
-	loader = JSONLoader(file_path, jq_schema='.content')
-	documents = loader.load()
+    try:
+        if filename.lower().endswith((".json")):
+    	loader = JSONLoader(file_path, jq_schema='.content')
+    	documents = loader.load()
 
-    elif filename.lower().endswith((".csv")):
-	loader = CSVLoader(file_path)
-	documents = loader.load()
-	
-    elif filename.lower().endswith((".pdf")):
-	loader = PyPDFLoader(file_path)
-	documents = loader.load()
+        elif filename.lower().endswith((".csv")):
+    	loader = CSVLoader(file_path)
+    	documents = loader.load()
+    	
+        elif filename.lower().endswith((".pdf")):
+    	loader = PyPDFLoader(file_path)
+    	documents = loader.load()
 
-    elif filename.lower().endswith((".xlsx")):
-	loader = UnstructuredExcelLoader(file_path)
-	documents = loader.load()
-	
-    elif filename.lower().endswith((".wav", ".mp3")):
-	documents = audio_to_text(file_path)
-    
-    else:
-	loader = UnstructuredFileLoader(file_path)
-	documents = loader.load()
-	
-    image_documents = extract_images(file_path)
-    
-    if len(image_documents) > 0:
-	documents.append(image_documents[0])
-    
-    # Split documents into chunks
-    texts = texts_splitter(documents)
-    
-    # Ingestion
-    response = ingesting_file_qdrant_db(collection_name, texts, model_type, config["qdrant_url"], config["qdrant_api_key"],
-					config['embedding_model'], config['cache_folder'], config['open_api_key'])
-    # print("response:", response)
-    
-    if response:
-	return "Ingesting Done"
-    else:
-	#os.remove(file_path)
-	return "Ingestion Failed"
-
-    # except Exception as e:
-    # # If the file was saved, attempt to remove it
-    #     if 'file_path' in locals():
-    #         try:
-    #             os.remove(file_path)
-    #         except:
-    #             pass  # If file removal fails, we don't want to mask the original error
+        elif filename.lower().endswith((".xlsx")):
+    	loader = UnstructuredExcelLoader(file_path)
+    	documents = loader.load()
+    	
+        elif filename.lower().endswith((".wav", ".mp3")):
+    	documents = audio_to_text(file_path)
         
-    #     # Log the error (you might want to use a proper logging system)
-    #     print(f"An error occurred: {str(e)}")
+        else:
+    	loader = UnstructuredFileLoader(file_path)
+    	documents = loader.load()
+    	
+        image_documents = extract_images(file_path)
         
-    #     # Return a user-friendly error message
-    #     return f"An error occurred during file processing: {str(e)}"
+        if len(image_documents) > 0:
+    	documents.append(image_documents[0])
+        
+        # Split documents into chunks
+        texts = texts_splitter(documents)
+        
+        # Ingestion
+        response = ingesting_file_qdrant_db(collection_name, texts, model_type, config["qdrant_url"], config["qdrant_api_key"],
+    					config['embedding_model'], config['cache_folder'], config['open_api_key'])
+        # print("response:", response)
+        
+        if response:
+    	   return "Ingesting Done"
+        else:
+    	#os.remove(file_path)
+    	return "Ingestion Failed"
+
+    except Exception as e:
+    # If the file was saved, attempt to remove it
+        if 'file_path' in locals():
+            try:
+                os.remove(file_path)
+            except:
+                pass  # If file removal fails, we don't want to mask the original error
+        
+        # Log the error (you might want to use a proper logging system)
+        print(f"An error occurred: {str(e)}")
+        
+        # Return a user-friendly error message
+        return f"An error occurred during file processing: {str(e)}"
 
 missed_files_from_folder_to_azure =  []
 def folder_upload_qdrant_sqs(sqs_message):
