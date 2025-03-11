@@ -19,7 +19,7 @@ from qdrant_client import QdrantClient
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.callbacks.manager import CallbackManager
 from langchain_community.document_loaders.csv_loader import CSVLoader
-from sentence_transformers import CrossEncoder
+# from sentence_transformers import CrossEncoder
 from langchain.document_loaders import UnstructuredFileLoader, TextLoader, JSONLoader, PyPDFLoader
 import json
 import openai
