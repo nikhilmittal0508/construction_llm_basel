@@ -32,6 +32,7 @@ from concurrent.futures import ProcessPoolExecutor
 from zipfile import ZipFile
 from sqs_queue_url import *
 from utils import *
+import chardet
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -56,35 +57,31 @@ def file_upload_qdrant_sqs(sqs_message):
     folder_path = sqs_message['folder_path']
 
     with open(file_path, 'rb') as f:
-        raw_data = f.read(10000)  # Read a small chunk of data
-        result = chardet.detect(raw_data)
-        encoding = result['encoding']
+        rawdata = f.read()
 
-    # Now read the file with the correct encoding
-    with open(file_path, 'r', encoding=encoding, errors='ignore') as f:
-        text = f.read()
-
+    result = chardet.detect(rawdata)
+    encoding = result['encoding']
 
     # try:
 
     if filename.lower().endswith((".json")):
-        loader = JSONLoader(file_path, jq_schema='.content')
+        loader = JSONLoader(file_path, jq_schema='.content',encoding=encoding)
         documents = loader.load()
 
     elif filename.lower().endswith((".csv")):
-        loader = CSVLoader(file_path)
+        loader = CSVLoader(file_path,encoding=encoding)
         documents = loader.load()
 
     elif file_path.endswith(".pdf"):
-        loader = PyPDFLoader(file_path)
+        loader = PyPDFLoader(file_path,encoding=encoding)
         documents = loader.load()
 
     elif file_path.endswith('.txt'):
-        loader = TextLoader(file_path)
+        loader = TextLoader(file_path,encoding=encoding)
         documents = loader.load()
 
     elif file_path.endswith('.docx'):
-        loader = Docx2txtLoader(file_path)
+        loader = Docx2txtLoader(file_path,encoding=encoding)
         documents = loader.load()
 
     else:
@@ -187,24 +184,30 @@ def ingest_file_process(folder_path, file_path, collection_name, model_type):
     print("ingest_file_process: file_path", file_path)
     # file_path = os.path.join(folder_path, filename)
 
-    if file_path.lower().endswith((".json")):
-        loader = JSONLoader(file_path, jq_schema='.content')
+    with open(file_path, 'rb') as f:
+        rawdata = f.read()
+
+    result = chardet.detect(rawdata)
+    encoding = result['encoding']
+
+    if filename.lower().endswith((".json")):
+        loader = JSONLoader(file_path, jq_schema='.content',encoding=encoding)
         documents = loader.load()
 
-    elif file_path.lower().endswith((".csv")):
-        loader = CSVLoader(file_path)
+    elif filename.lower().endswith((".csv")):
+        loader = CSVLoader(file_path,encoding=encoding)
         documents = loader.load()
 
     elif file_path.endswith(".pdf"):
-        loader = PyPDFLoader(file_path)
+        loader = PyPDFLoader(file_path,encoding=encoding)
         documents = loader.load()
 
     elif file_path.endswith('.txt'):
-        loader = TextLoader(file_path)
+        loader = TextLoader(file_path,encoding=encoding)
         documents = loader.load()
 
     elif file_path.endswith('.docx'):
-        loader = Docx2txtLoader(file_path)
+        loader = Docx2txtLoader(file_path,encoding=encoding)
         documents = loader.load()
 
     else:
