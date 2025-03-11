@@ -2,7 +2,7 @@ from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import LLMChainExtractor
-from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+# from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter, TextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import Qdrant
