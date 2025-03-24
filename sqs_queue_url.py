@@ -1,4 +1,5 @@
 import boto3
+import json
 
 config_file_path = 'params.json'
 
