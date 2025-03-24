@@ -34,6 +34,7 @@ import openai
 from langchain_openai import ChatOpenAI, OpenAI
 import shutil
 from concurrent.futures import ProcessPoolExecutor
+import uuid
 from sqs_queue_url import *
 from utils import *
 
@@ -247,7 +248,10 @@ def file_ingestion_qdrant():
         sqs_messages = json.dumps(sqs_messages)
 
         #sqs_queue.put(sqs_messages)
-        sqs.send_message(QueueUrl=queue_url,MessageBody=sqs_messages,MessageGroupId="12345",MessageDeduplicationId="56789")
+
+        unique_id = uuid.uuid4()
+
+        sqs.send_message(QueueUrl=queue_url,MessageBody=sqs_messages,MessageGroupId="Group-"+str(unique_id),MessageDeduplicationId="Dup-"+str(unique_id))
 
         
         return "request for file ingestion is added into the sqs queue, pls come back after 30min"
@@ -298,7 +302,11 @@ def ingest_folder():
         sqs_messages = json.dumps(sqs_messages)
 
         #sqs_queue.put(sqs_messages)
-        sqs.send_message(QueueUrl=queue_url,MessageBody=sqs_messages,MessageGroupId="12345",MessageDeduplicationId="56789")
+
+        unique_id = uuid.uuid4()
+
+        sqs.send_message(QueueUrl=queue_url,MessageBody=sqs_messages,MessageGroupId="Group-"+str(unique_id),MessageDeduplicationId="Dup-"+str(unique_id))
+        #sqs.send_message(QueueUrl=queue_url,MessageBody=sqs_messages,MessageGroupId="12345",MessageDeduplicationId="56789")
 
         return "request for folder ingestion is added into the sqs queue, pls come back after 30min"
         
