@@ -247,7 +247,7 @@ def file_ingestion_qdrant():
         sqs_messages = json.dumps(sqs_messages)
 
         #sqs_queue.put(sqs_messages)
-        sqs.send_message(QueueUrl=queue_url,MessageBody=sqs_messages)
+        sqs.send_message(QueueUrl=queue_url,MessageBody=sqs_messages,MessageGroupId="12345",MessageDeduplicationId="56789")
 
         
         return "request for file ingestion is added into the sqs queue, pls come back after 30min"
@@ -298,7 +298,7 @@ def ingest_folder():
         sqs_messages = json.dumps(sqs_messages)
 
         #sqs_queue.put(sqs_messages)
-        sqs.send_message(QueueUrl=queue_url,MessageBody=sqs_messages)
+        sqs.send_message(QueueUrl=queue_url,MessageBody=sqs_messages,MessageGroupId="12345",MessageDeduplicationId="56789")
 
         return "request for folder ingestion is added into the sqs queue, pls come back after 30min"
         
