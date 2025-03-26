@@ -73,7 +73,8 @@ def file_upload_qdrant_sqs(sqs_message):
             documents = loader.load()
 
         elif file_path.endswith(".pdf"):
-            loader = PyPDFLoader(file_path,encoding=encoding)
+            # loader = PyPDFLoader(file_path,encoding=encoding)
+            loader = PyPDFLoader(file_path)
             documents = loader.load()
 
         elif file_path.endswith('.txt'):
@@ -81,7 +82,8 @@ def file_upload_qdrant_sqs(sqs_message):
             documents = loader.load()
 
         elif file_path.endswith('.docx'):
-            loader = Docx2txtLoader(file_path,encoding=encoding)
+            # loader = Docx2txtLoader(file_path,encoding=encoding)
+            loader = Docx2txtLoader(file_path)
             documents = loader.load()
 
         else:
@@ -199,7 +201,8 @@ def ingest_file_process(folder_path, file_path, collection_name, model_type):
         documents = loader.load()
 
     elif file_path.endswith(".pdf"):
-        loader = PyPDFLoader(file_path,encoding=encoding)
+        # loader = PyPDFLoader(file_path,encoding=encoding)
+        loader = PyPDFLoader(file_path)
         documents = loader.load()
 
     elif file_path.endswith('.txt'):
@@ -207,7 +210,8 @@ def ingest_file_process(folder_path, file_path, collection_name, model_type):
         documents = loader.load()
 
     elif file_path.endswith('.docx'):
-        loader = Docx2txtLoader(file_path,encoding=encoding)
+        # loader = Docx2txtLoader(file_path,encoding=encoding)
+        loader = Docx2txtLoader(file_path)
         documents = loader.load()
 
     else:
